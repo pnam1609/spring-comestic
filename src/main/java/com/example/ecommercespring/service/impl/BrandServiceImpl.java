@@ -35,6 +35,18 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public Response addNew(BrandDTO brandDTO){
+        if(brandDTO.getPhoneNumber() ==null || brandDTO.getEmail() ==null){
+            return new Response(false,"Số điện thoại hoặc email rỗng");
+        }
+        Brand checkBrandPN = brandRepository.findByEmail(brandDTO.getEmail());
+        if(checkBrandPN != null){
+            return new Response(false,"Email đã tồn tại");
+        }
+
+        Brand checkBrand = brandRepository.findByPhoneNumber(brandDTO.getPhoneNumber());
+        if(checkBrand != null){
+            return new Response(false,"Số điện thoại đã tồn tại");
+        }
         brandRepository.save(brandDTO.toEntity());
         return new Response(true,"Thêm hãng thành công");
     }
@@ -43,6 +55,23 @@ public class BrandServiceImpl implements BrandService {
     public Response modify(BrandDTO brandDTO){
         Brand brand = brandRepository.findById(brandDTO.getBrandId()).orElse(null);
         if(brand == null) return new Response(false,"Hãng không tồn tại");
+
+        if(brandDTO.getPhoneNumber() ==null || brandDTO.getEmail() ==null){
+            return new Response(false,"Số điện thoại hoặc email rỗng");
+        }
+        if(brandDTO.getEmail() != brand.getEmail()){
+            Brand checkBrandPN = brandRepository.findByEmail(brandDTO.getEmail());
+            if(checkBrandPN != null){
+                return new Response(false,"Email đã tồn tại");
+            }
+        }
+        if(brandDTO.getPhoneNumber() != brand.getPhoneNumber()){
+            Brand checkBrand = brandRepository.findByPhoneNumber(brandDTO.getPhoneNumber());
+            if(checkBrand != null){
+                return new Response(false,"Số điện thoại đã tồn tại");
+            }
+        }
+
         brand.setBrandName(brandDTO.getBrandName());
         brand.setEmail(brandDTO.getEmail());
         brand.setPhoneNumber(brandDTO.getPhoneNumber());

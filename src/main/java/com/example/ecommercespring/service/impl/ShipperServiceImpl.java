@@ -4,6 +4,7 @@ import com.example.ecommercespring.dto.ShipperDTO;
 import com.example.ecommercespring.dto.ShippingCompanyDTO;
 import com.example.ecommercespring.entity.Shipper;
 import com.example.ecommercespring.entity.ShippingCompany;
+import com.example.ecommercespring.entity.User;
 import com.example.ecommercespring.repository.ShipperRepository;
 import com.example.ecommercespring.repository.ShippingCompanyRepository;
 import com.example.ecommercespring.respone.Response;
@@ -42,6 +43,21 @@ public class ShipperServiceImpl implements ShipperService {
                 .orElse(null);
         if(shippingCompany == null)
             return new Response(false,"Đơn vị vận chuyển không tồn tại");
+
+        if(shipperDTO.getPhoneNumber() ==null || shipperDTO.getEmail() ==null){
+            return new Response(false,"Số điện thoại hoặc email rỗng");
+        }
+
+        Shipper checkShipperPN = shipperRepository.findByPhoneNumber(shipperDTO.getPhoneNumber());
+        if(checkShipperPN != null){
+            return new Response(false,"Số điện thoại đã tồn tại");
+        }
+
+        Shipper checkShipper = shipperRepository.findByEmail(shipperDTO.getEmail());
+        if(checkShipper != null){
+            return new Response(false,"Email đã tồn tại");
+        }
+
         Shipper shipper = shipperDTO.toEntity();
         shipper.setShippingCompany(shippingCompany);
         shipperRepository.save(shipper);
@@ -55,6 +71,24 @@ public class ShipperServiceImpl implements ShipperService {
         if (shipper == null) {
             return new Response(false,"Nhân viên vận chuyển không tồn tại");
         }
+        if(shipperDTO.getPhoneNumber() ==null || shipperDTO.getEmail() ==null){
+            return new Response(false,"Số điện thoại hoặc email rỗng");
+        }
+
+        if(shipper.getPhoneNumber() != shipperDTO.getPhoneNumber()){
+            Shipper checkShipper = shipperRepository.findByPhoneNumber(shipperDTO.getPhoneNumber());
+            if(checkShipper != null){
+                return new Response(false,"Số điện thoại đã tồn tại");
+            }
+        }
+
+        if(shipper.getEmail() != shipperDTO.getEmail()){
+            Shipper checkShipper = shipperRepository.findByEmail(shipperDTO.getEmail());
+            if(checkShipper != null){
+                return new Response(false,"Email đã tồn tại");
+            }
+        }
+
         if(shipperDTO.getShippingCompanyId() != shipper.getShippingCompany().getShippingCompanyId()){
             ShippingCompany shippingCompany = shippingCompanyRepository.findById(shipperDTO.getShippingCompanyId())
                     .orElse(null);
