@@ -60,39 +60,4 @@ public class InvoiceServiceImpl implements InvoiceService {
         return new Response(true,"Tạo hóa đơn thành công");
     }
 
-    @Override
-    public ResponseEntity<?> getStatistic(Integer year){
-        int yearCurrent = Calendar.getInstance().get(Calendar.YEAR);
-        if(year > yearCurrent){
-            return ResponseEntity.badRequest().body(new Response(false, "Không thể thống kê thời gian trong tương lai"));
-        }
-
-        List<Integer> integerList = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
-
-        int month = 1;
-        if(year == yearCurrent){
-            month = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        }else{
-            month = 12;
-        }
-        for (int i = 1; i<= month; i++){
-            cal.set(year,i,1);
-            Date firstDateOfMonth = new Date(cal.getTimeInMillis());
-            cal.set(year,i+1,1);
-            Date lastDateOfMonth = new Date(cal.getTimeInMillis());
-
-            try{
-                Integer sum = invoiceRepository.findAll().stream()
-                        .filter(invoice -> invoice.getDateCreated().compareTo(firstDateOfMonth) > 0
-                                && invoice.getDateCreated().compareTo(lastDateOfMonth) < 0)
-                        .mapToInt(value -> value.getTotalPrice())
-                        .sum();
-                integerList.add(sum);
-            }catch (Exception e ){
-                integerList.add(0);
-            }
-        }
-        return ResponseEntity.ok(integerList);
-    }
 }

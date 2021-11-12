@@ -33,11 +33,12 @@ public class OrderSupplyServiceImpl implements OrderSupplyService {
     public List<OrderSupplyDTO> getAll() {
         return orderSupplyRepository.findAll().stream().map(OrderSupplyDTO::new).collect(Collectors.toList());
     }
+
     @Override
-    public ResponseEntity<?> getById(Long id){
+    public ResponseEntity<?> getById(Long id) {
         OrderSupply orderSupply = orderSupplyRepository.findById(id).orElse(null);
-        if(orderSupply == null){
-            return ResponseEntity.badRequest().body(new Response(false,"Đơn đặt hàng không tồn tại"));
+        if (orderSupply == null) {
+            return ResponseEntity.badRequest().body(new Response(false, "Đơn đặt hàng không tồn tại"));
         }
         return ResponseEntity.ok(new OrderSupplyDTO(orderSupply));
     }
@@ -57,9 +58,14 @@ public class OrderSupplyServiceImpl implements OrderSupplyService {
         List<DetailOS> detailOSList = new ArrayList<>();
         for (DetailOSDTO detailOSDTO : orderSupplyDTO.getDetailOSList()) {
             DetailOS detailOS = detailOSDTO.toEntity();
+
             Product product = productRepository.findById(detailOSDTO.getProductId()).orElse(null);
             if (product == null) {
                 return new Response(false, "Sản phẩm không tồn tại");
+            }
+            if (product.getBrand().getBrandId() != orderSupplyDTO.getBrandId()) {
+                return new Response(false, "Sản phẩm " + product.getProductName() +
+                        " thuộc hãng " + product.getBrand().getBrandName());
             }
             detailOS.setProduct(product);
             detailOS.setOrderSupply(orderSupply);
@@ -78,7 +84,7 @@ public class OrderSupplyServiceImpl implements OrderSupplyService {
         if (orderSupply == null)
             return new Response(false, "Đơn đặt hàng từ hãng không tồn tại");
         //kiểm tra nếu khác mã thì mới đi kiểm tra
-        if(orderSupply.getBrand().getBrandId() != orderSupplyDTO.getBrandId()){
+        if (orderSupply.getBrand().getBrandId() != orderSupplyDTO.getBrandId()) {
             Brand brand = brandRepository.findById(orderSupplyDTO.getBrandId()).orElse(null);
             if (brand == null) {
                 return new Response(false, "Mã hãng không tồn tại");
@@ -91,13 +97,13 @@ public class OrderSupplyServiceImpl implements OrderSupplyService {
         }
         orderSupply.setUser(user);
 
-        if(updateStatus){
+        if (updateStatus) {
             orderSupply.setStatus(orderSupplyDTO.getStatus());
-        }else {
+        } else {
             for (DetailOSDTO detailOSDTO : orderSupplyDTO.getDetailOSList()) {
                 DetailOS detailOS = detailOSRepository.findById(
-                        new DetailOSKey(orderSupply.getOrderSupplyId(),detailOSDTO.getProductId())).orElse(null);
-                if(detailOS == null){
+                        new DetailOSKey(orderSupply.getOrderSupplyId(), detailOSDTO.getProductId())).orElse(null);
+                if (detailOS == null) {
                     Product product = productRepository.findById(detailOSDTO.getProductId()).orElse(null);
                     if (product == null) {
                         return new Response(false, "Sản phẩm không tồn tại");
@@ -106,7 +112,7 @@ public class OrderSupplyServiceImpl implements OrderSupplyService {
                     detailOS.setProduct(product);
                     detailOS.setOrderSupply(orderSupply);
                     orderSupply.getDetailOSList().add(detailOS);
-                }else {
+                } else {
                     detailOS.setPrice(detailOSDTO.getPrice());
                     detailOS.setQuantity(detailOSDTO.getQuantity());
                 }

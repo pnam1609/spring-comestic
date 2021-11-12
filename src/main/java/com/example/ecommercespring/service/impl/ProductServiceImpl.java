@@ -44,7 +44,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDTO> getAll() {
-        return productRepository.findAll().stream().map(ProductDTO::new).collect(Collectors.toList());
+        return productRepository.findAll().stream().map(ProductDTO::new)
+                .sorted(Comparator.comparing(o -> o.getQuantityInStock()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -101,7 +103,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Response addNew(ProductDTO productDTO) {
-        if (productDTO.getBrandId() == null || productDTO.getBrandId() == null) {
+        if (productDTO == null || productDTO.getBrandId() == null) {
             return new Response(false, "Dữ liệu trống");
         }
         Brand brand = brandRepository.findById(productDTO.getBrandId()).orElse(null);

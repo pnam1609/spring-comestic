@@ -31,8 +31,8 @@ public class InvoiceController {
         return invoiceService.addNew(invoiceDTO);
     }
 
-    @GetMapping("statistic/revenue/{year}")
-    public ResponseEntity<?> GetStatistic(@PathVariable("year") Integer year){
-        return invoiceService.getStatistic(year);
-    }
+
+
+//    @PostMapping
+//    public ResponseEntity<?> getProfit()
 }

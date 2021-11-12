@@ -58,6 +58,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             detailReceipt.setProduct(product);
             detailReceipt.setReceipt(receipt);
             detailReceiptList.add(detailReceipt);
+            product.setQuantityInStock(product.getQuantityInStock() + detailReceiptDTO.getQuantity());
         }
         receipt.setDetailReceiptList(detailReceiptList);
         receipt.setUser(user);

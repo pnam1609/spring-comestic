@@ -9,5 +9,5 @@ import java.util.List;
 public interface InvoiceService {
     public List<InvoiceDTO> getAll();
     public Response addNew(InvoiceDTO invoiceDTO);
-    public ResponseEntity<?> getStatistic(Integer year);
+//    public ResponseEntity<?> getStatistic(Integer year);
 }
